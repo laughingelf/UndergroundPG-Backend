@@ -1,7 +1,8 @@
 var express = require('express');
+var router = express.Router();
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-var router = express.Router();
+
 
 
 const saltRounds = 10
@@ -9,6 +10,8 @@ const saltRounds = 10
 
 
 const User = require('../models/User.model')
+const mailer = require('../services/mailer')
+
 
 router.post('/signup', (req, res, next) => {
     const { username, email, password } = req.body
@@ -47,7 +50,8 @@ router.post('/signup', (req, res, next) => {
                 password: hashedPassword
             })
                 .then((createdUser) => {
-                    const { _id, email, password } = createdUser
+
+                    const { _id, username, email } = createdUser
                     const payload = {
                         _id,
                         username,
@@ -59,6 +63,10 @@ router.post('/signup', (req, res, next) => {
                         process.env.SECRET,
                         { algorithm: 'HS256', expiresIn: "6h" }
                     )
+
+                    //script to send email. **currently not working
+                    // mailer() 
+
                     res.status(201).json({ authToken: authToken, user: payload })
                 })
                 .catch((err) => {
@@ -94,6 +102,10 @@ router.post('/login', (req, res, next) => {
             const passwordVerified = bcryptjs.compareSync(password, foundUser.password)
 
             if (passwordVerified) {
+                //this checks if the user have verified email. **functionality not currently working
+                // if (!foundUser.isVerified) { 
+                //     return res.status(401).json({ message: "Your email has not been verfied" }) 
+                // }
                 const { _id, email, username, firstName, lastName } = foundUser
 
                 const payload = { _id, email, username, firstName, lastName }
@@ -113,6 +125,18 @@ router.post('/login', (req, res, next) => {
         .catch(err => res.status(500).json({ message: "Internal Server Error" }))
 
 
+})
+
+
+router.get('/verify', (req, res, next) => {
+    User.findById(req.user._id)
+        .then((foundUser) => {
+            delete foundUser._doc.password
+            res.status(200).json(foundUser)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 })
 
 

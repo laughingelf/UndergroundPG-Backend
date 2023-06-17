@@ -12,7 +12,8 @@ const userSchema = new Schema(
         mathLevel: { type: Number },
         letterLevel: { type: Number },
         wordLevel: { type: Number },
-        numberLevel: { type: Number }
+        numberLevel: { type: Number },
+        isVerified: { type: Boolean, default: false }
     },
     {
         timestamps: true

@@ -9,10 +9,10 @@ const userSchema = new Schema(
         birthdate: { type: Date },
         password: { type: String },
         profilePic: { type: String },
-        mathLevel: { type: Number },
-        letterLevel: { type: Number },
-        wordLevel: { type: Number },
-        numberLevel: { type: Number },
+        mathLevel: { type: Number, default: 1 },
+        letterLevel: { type: Number, default: 1 },
+        wordLevel: { type: Number, default: 1 },
+        numberLevel: { type: Number, default: 1 },
         isVerified: { type: Boolean, default: false }
     },
     {

@@ -11,6 +11,7 @@ const saltRounds = 10
 
 const User = require('../models/User.model')
 const mailer = require('../services/mailer')
+const isAuthenticated = require('../middleware/isAuthenticated')
 
 
 router.post('/signup', (req, res, next) => {
@@ -106,9 +107,9 @@ router.post('/login', (req, res, next) => {
                 // if (!foundUser.isVerified) { 
                 //     return res.status(401).json({ message: "Your email has not been verfied" }) 
                 // }
-                const { _id, email, username, firstName, lastName } = foundUser
+                const { _id, email, username, firstName, lastName, birthdate, profilePic, mathLevel, letterLevel, wordLevel, numberLevel, isVerified } = foundUser
 
-                const payload = { _id, email, username, firstName, lastName }
+                const payload = { _id, email, username, firstName, lastName, birthdate, profilePic, mathLevel, letterLevel, wordLevel, numberLevel, isVerified }
 
                 const authToken = jwt.sign(
                     payload,
@@ -128,10 +129,12 @@ router.post('/login', (req, res, next) => {
 })
 
 
-router.get('/verify', (req, res, next) => {
+router.get('/verify', isAuthenticated, (req, res, next) => {
+    console.log('verifying id', req.user)
     User.findById(req.user._id)
         .then((foundUser) => {
             delete foundUser._doc.password
+            console.log('founding', foundUser)
             res.status(200).json(foundUser)
         })
         .catch((err) => {
